@@ -1,0 +1,65 @@
+table Account
+	lineageTag: 3d1c0b61-ad02-47d3-bea3-f7170478f735
+
+	column Key_Account
+		dataType: string
+		sourceProviderType: nchar
+		lineageTag: 391c45b3-c632-40dc-83ca-90bb07f1a463
+		summarizeBy: none
+		sourceColumn: Key_Account
+
+		annotation SummarizationSetBy = Automatic
+
+	column Name
+		dataType: string
+		sourceProviderType: nvarchar(max)
+		lineageTag: df7e34b4-87a5-4948-b58e-12d73338d5e3
+		summarizeBy: none
+		sourceColumn: Name
+
+		annotation SummarizationSetBy = Automatic
+
+	column Vertical
+		dataType: string
+		sourceProviderType: nvarchar(max)
+		lineageTag: 6db6e901-f453-4390-8f20-30b2c6259b4a
+		summarizeBy: none
+		sourceColumn: Vertical
+
+		annotation SummarizationSetBy = Automatic
+
+	partition Account = m
+		mode: directQuery
+		source = ```
+				let
+				    Dataverse = CommonDataService.Database(Environment, 
+				        [CreateNavigationProperties=false]),
+				    SQL = "SELECT 
+				    accountid AS [Key_Account],
+				    name AS Name,
+				    CASE
+				        WHEN edp_verticalidname = 'Professional Services' THEN 'Professional Services'
+				        WHEN edp_verticalidname = 'Property Management' THEN 'Property Management'
+				        WHEN edp_verticalidname = 'Automotive Machinery' THEN 'Automotive Machinery'
+				        WHEN edp_verticalidname IS NULL OR edp_verticalidname = '' THEN 'No Category'
+				        ELSE 'Other'
+				    END AS Vertical
+				FROM 
+				    account
+				
+				
+				",
+				    Source = Value.NativeQuery(
+				        Dataverse,
+				        SQL,
+				        null,
+				        [EnableFolding=true]
+				    )
+				in
+				    Source
+				```
+
+	annotation PBI_NavigationStepName = Navigation
+
+	annotation PBI_ResultType = Exception
+

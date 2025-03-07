@@ -1,0 +1,505 @@
+table Measure
+	lineageTag: 55dc104f-f552-47e8-a93b-ea704ee58040
+
+	measure 'Won Value EaaS Services' = ```
+			// Calculates the total value of won opportunities for EaaS Services
+			// Returns 0 if no matching records are found
+			VAR Consultancy=
+			CALCULATE(
+			    SUM('OpportunityRevenue'[Total Sum]), 
+			    'OpportunityRevenue'[Revenue Type]= "EaaS Services", 
+			    Opportunity[Status]="Won"
+			    )
+			RETURN
+			IF(ISBLANK(Consultancy), 0, Consultancy)
+			```
+		displayFolder: EaaS
+		lineageTag: 964e0cde-d8e6-4a0f-b739-9ae3730d91d0
+
+		changedProperty = IsHidden
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure 'Weighted OpportunityRevenue Value Per Year' = ```
+			// Calculates the weighted annual pipeline value for Carbon Credit opportunities
+			// Returns either weighted or unweighted value based on Toggle selection
+			
+			VAR TotalAmount100 = 
+			    CALCULATE(
+			            SUMX('OpportunityRevenue',
+			            'OpportunityRevenue'[Total Sum]/'OpportunityRevenue'[Total Revenue Years]
+			            ),
+			            'OpportunityRevenue'[Revenue Type] = "Carbon Credit",
+			            Opportunity[Status] = "In Progress",
+			            'OpportunityRevenue'[Carbon Credit]="Yes"
+			    )
+			
+			VAR TotalAmountWeighted = 
+			    CALCULATE(
+			        SUMX(
+			            'OpportunityRevenue', 
+			            ('OpportunityRevenue'[Total Sum] / 'OpportunityRevenue'[Total Revenue Years]) * RELATED(Opportunity[Probability])
+			        ),
+			        'OpportunityRevenue'[Revenue Type] = "Carbon Credit",
+			        Opportunity[Status] = "In Progress",
+			        'OpportunityRevenue'[Carbon Credit]="Yes"
+			    )
+			
+			RETURN
+			IF(
+			    ISFILTERED(Toggle[Opportunity]),
+			    TotalAmount100,
+			    TotalAmountWeighted
+			)
+			
+			```
+		formatString: #,0
+		displayFolder: Carbon Credit
+		lineageTag: ac9cd9ae-da19-4f55-8523-2c60baa39bff
+
+		changedProperty = IsHidden
+
+		annotation PBI_FormatHint = {"isDecimal":true}
+
+	measure 'EaaS Goal' = ```
+			// Calculates the EaaS goal based on the selected vertical market
+			// Returns the appropriate goal value or the sum of all goals if no vertical is selected
+			
+			VAR SelectedVerticals = ALLSELECTED(Account[Vertical])
+			VAR RE_goal = 4800000
+			VAR COMM_goal = 43021231
+			VAR AM_goal = 22900000
+			VAR Other_goal = 4100000
+			VAR Total = RE_goal + COMM_goal + AM_goal + Other_goal
+			VAR IsAnyFilterApplied = COUNTROWS(ALLSELECTED(Account[Vertical])) < COUNTROWS(ALL(Account[Vertical]))
+			VAR isEcommerceSelected = IsAnyFilterApplied && CONTAINS(SelectedVerticals, Account[Vertical], "E-Commerce")
+			VAR isRenewableSelected = IsAnyFilterApplied && CONTAINS(SelectedVerticals, Account[Vertical], "Renewable Energy")
+			VAR IsAutomotiveMachinerySelected = IsAnyFilterApplied && CONTAINS(SelectedVerticals, Account[Vertical], "Automotive Machinery")
+			VAR IsOtherSelected = IsAnyFilterApplied && CONTAINS(SelectedVerticals, Account[Vertical], "Other")
+			RETURN
+			
+			SWITCH(
+			    TRUE(),
+			    isEcommerceSelected, COMM_goal,
+			    isRenewableSelected, RE_goal,
+			    IsAutomotiveMachinerySelected, AM_goal,
+			    IsOtherSelected, Other_goal,
+			    Total
+			)
+			
+			```
+		formatString: 0
+		displayFolder: Goals
+		lineageTag: fd1aa9c7-347c-433a-8fe0-0fdd5b66ee39
+
+		changedProperty = IsHidden
+
+	measure 'PPA Goal' = ```
+			// Calculates the PPA goal based on the selected vertical market
+			// Returns the appropriate goal value or the sum of all goals if no vertical is selected
+			
+			VAR SelectedVerticals = ALLSELECTED(Account[Vertical])
+			VAR RE_goal  = 956341
+			VAR COMM_goal  = 1424116
+			VAR AM_goal = 1985447
+			VAR Other_goal = 634096
+			VAR NoCategory = 0
+			VAR Total = RE_goal  + COMM_goal  + AM_goal + Other_goal
+			VAR IsAnyFilterApplied = COUNTROWS(ALLSELECTED(Account[Vertical])) < COUNTROWS(ALL(Account[Vertical]))
+			VAR isEcommerceSelected  = IsAnyFilterApplied && CONTAINS(SelectedVerticals, Account[Vertical], "E-Commerce")
+			VAR isRenewableSelected  = IsAnyFilterApplied && CONTAINS(SelectedVerticals, Account[Vertical], "Renewable Energy")
+			VAR IsAutomotiveMachinerySelected = IsAnyFilterApplied && CONTAINS(SelectedVerticals, Account[Vertical], "Automotive Machinery")
+			VAR IsOtherSelected = IsAnyFilterApplied && CONTAINS(SelectedVerticals, Account[Vertical], "Other")
+			VAR IsNoCategorySelected = IsAnyFilterApplied && CONTAINS(SelectedVerticals, Account[Vertical], "NoCategory")
+			RETURN
+			
+			SWITCH(
+			    TRUE(),
+			    isEcommerceSelected, COMM_goal,
+			    isRenewableSelected, RE_goal,
+			    IsAutomotiveMachinerySelected, AM_goal,
+			    IsOtherSelected, Other_goal,
+			    IsNoCategorySelected, NoCategory,
+			    Total
+			)
+			
+			
+			
+			
+			```
+		formatString: 0
+		displayFolder: Goals
+		lineageTag: 5be902ff-83e7-445b-a669-cdc4ce167558
+
+		changedProperty = IsHidden
+
+	measure 'Carbon Credit Goal' = ```
+			// Calculates the Carbon Credit goal based on the selected vertical market
+			// Note that Automotive Machinery has a goal of 0 for Carbon Credits
+			
+			VAR SelectedVerticals = ALLSELECTED(Account[Vertical])
+			VAR RE_goal = 321966
+			VAR COMM_goal  = 412371
+			VAR AM_goal = 0
+			VAR Other_goal = 477663
+			VAR Total = RE_goal  + COMM_goal  + AM_goal + Other_goal
+			VAR IsAnyFilterApplied = COUNTROWS(ALLSELECTED(Account[Vertical])) < COUNTROWS(ALL(Account[Vertical]))
+			VAR isEcommerceSelected  = IsAnyFilterApplied && CONTAINS(SelectedVerticals, Account[Vertical], "E-Commerce")
+			VAR isRenewableSelected   = IsAnyFilterApplied && CONTAINS(SelectedVerticals, Account[Vertical], "Renewable Energy")
+			VAR IsAutomotiveMachinerySelected = IsAnyFilterApplied && CONTAINS(SelectedVerticals, Account[Vertical], "Automotive Machinery")
+			VAR IsOtherSelected = IsAnyFilterApplied && CONTAINS(SelectedVerticals, Account[Vertical], "Other")
+			RETURN
+			
+			SWITCH(
+			    TRUE(),
+			    isEcommerceSelected, COMM_goal,
+			    isRenewableSelected, RE_goal,
+			    IsAutomotiveMachinerySelected, AM_goal,
+			    IsOtherSelected, Other_goal,
+			    Total
+			)
+			
+			```
+		formatString: 0
+		displayFolder: Goals
+		lineageTag: 9251af6c-85e0-477c-bea1-dddf5a2af8de
+
+		changedProperty = IsHidden
+
+	measure 'Remaining Amount EaaS' =
+			// Calculates the remaining amount needed to reach the EaaS goal
+			// Returns 0 if the goal has been exceeded
+			
+			VAR RemainingTotal= [EaaS Goal] - [Won Value EaaS Services] - [Weighted Opportunity Pipe EaaS]
+			RETURN
+			
+			IF(RemainingTotal < 0,
+			    0,
+			    RemainingTotal
+			)
+		formatString: #,0
+		displayFolder: EaaS
+		lineageTag: 5ddf3be6-d95a-4e98-a1a6-f6ac151c7bd7
+
+		changedProperty = IsHidden
+
+		annotation PBI_FormatHint = {"isDecimal":true}
+
+	measure 'Remaining Amount PPA' =
+			// Calculates the remaining amount needed to reach the PPA goal
+			// Returns 0 if the goal has been exceeded
+			
+			VAR RemainingTotal = [PPA Goal] - [Won Revenue Value Per Year PPA] - [Weighted OpportunityRevenue Value Per Year PPA]
+			RETURN
+			
+			IF(RemainingTotal < 0,
+			    0,
+			    RemainingTotal
+			)
+		formatString: #,0
+		displayFolder: PPA
+		lineageTag: 4047a8d7-b8d7-4e92-b3e3-d3c3c15cd7e7
+
+		changedProperty = IsHidden
+
+		annotation PBI_FormatHint = {"isDecimal":true}
+
+	measure 'Remaining Amount Carbon Credit' =
+			// Calculates the remaining amount needed to reach the Carbon Credit goal
+			// Returns 0 if the goal has been exceeded
+			
+			VAR RemainingTotal = [Carbon Credit Goal] - [Won Revenue Value Per Year] - [Weighted OpportunityRevenue Value Per Year]
+			RETURN
+			
+			IF(RemainingTotal < 0,
+			    0,
+			    RemainingTotal
+			)
+		formatString: #,0
+		displayFolder: Carbon Credit
+		lineageTag: 4a2624fa-b808-4be9-8358-aad13db72738
+
+		changedProperty = IsHidden
+
+		annotation PBI_FormatHint = {"isDecimal":true}
+
+	measure 'Goal - Won EaaS' =
+			// Calculates how much of the EaaS goal has been achieved
+			// Used for visualization purposes
+			
+			VAR Remaining = [EaaS Goal] - [Won Value EaaS Services]
+			RETURN
+			
+			IF(Remaining>=0, -Remaining, 0)
+		formatString: #,0
+		displayFolder: Goals
+		lineageTag: 8a6ec271-81ef-4c0f-91c7-c3d5b4245b0e
+
+		changedProperty = IsHidden
+
+		annotation PBI_FormatHint = {"isDecimal":true}
+
+	measure 'Goal - Won PPA' =
+			// Calculates how much of the PPA goal has been achieved
+			// Used for visualization purposes
+			
+			VAR Remaining = [PPA Goal] - [Won Revenue Value Per Year PPA]
+			RETURN
+			
+			IF(Remaining>=0, -Remaining, 0)
+		formatString: #,0
+		displayFolder: Goals
+		lineageTag: 7ce3a964-de2b-4720-965b-57e5dafd4a04
+
+		changedProperty = IsHidden
+
+		annotation PBI_FormatHint = {"isDecimal":true}
+
+	measure 'Goal - Won Carbon Credit' =
+			// Calculates how much of the Carbon Credit goal has been achieved
+			// Used for visualization purposes
+			
+			VAR Remaining = [Carbon Credit Goal] - [Won Revenue Value Per Year]
+			RETURN
+			
+			IF(Remaining>=0, -Remaining, 0)
+		formatString: #,0
+		displayFolder: Goals
+		lineageTag: ca9dcf02-7322-483d-9ea1-641d63c134d2
+
+		changedProperty = IsHidden
+
+		annotation PBI_FormatHint = {"isDecimal":true}
+
+	measure 'Goal Checkmark EaaS' =
+			// Displays a checkmark symbol when the EaaS goal has been achieved
+			
+			IF([Goal - Won EaaS] >=0, "<span style=""font-size: 70px; line-height: 70px; color: #C1CCE3;"">&#10003;</span>","")
+		displayFolder: Goals
+		lineageTag: cdb53827-58d3-4e91-96c6-67136cd84faf
+
+		changedProperty = IsHidden
+
+	measure 'Goal Checkmark PPA' = ```
+			// Displays a checkmark symbol when the PPA goal has been achieved
+			
+			IF([Goal - Won PPA] >=0, "<span style=""font-size: 70px; line-height: 70px; color: #C1CCE3;"">&#10003;</span>","")
+			
+			
+			```
+		displayFolder: Goals
+		lineageTag: 22855f2a-b9d1-4acf-afd1-d7ffd7f9dd38
+
+		changedProperty = IsHidden
+
+	measure 'Goal Checkmark Carbon Credit' = ```
+			// Displays a checkmark symbol when the Carbon Credit goal has been achieved
+			// For Automotive Machinery vertical, displays "No Goal" since there is no Carbon Credit goal
+			
+			SWITCH(
+			    TRUE(),
+			    SELECTEDVALUE(Account[Vertical]) = "Automotive Machinery", "No Goal",  // Om vertikalen är Automotive Machinery visas inget mål då detta ej finns för AM.
+			    [Goal - Won Carbon Credit] >= 0, "<span style='font-size: 70px; line-height: 70px; color: #C1CCE3;'>&#10003;</span>",
+			    ""
+			)
+			
+			
+			
+			```
+		displayFolder: Goals
+		lineageTag: 4ecd21a5-3a42-4f7c-be90-26a8f23beaa8
+
+		changedProperty = IsHidden
+
+	measure '100% Pipe EaaS' = ```
+			// Calculates the portion of the EaaS pipeline that contributes to reaching the goal
+			// Returns either the full weighted pipeline value or just the amount needed to reach the goal
+			
+			    IF(
+			        [Weighted Opportunity Pipe EaaS] <= -[Goal - Won EaaS], [Weighted Opportunity Pipe EaaS], 
+			        -[Goal - Won EaaS])
+			```
+		formatString: 0
+		displayFolder: EaaS
+		lineageTag: 5b5f7103-bae6-486c-b751-0f7050a2e0e6
+
+		changedProperty = IsHidden
+
+	measure '100% Pipe PPA' = ```
+			// Calculates the portion of the PPA pipeline that contributes to reaching the goal
+			// Returns either the full weighted pipeline value or just the amount needed to reach the goal
+			
+			    IF(
+			        [Weighted OpportunityRevenue Value Per Year PPA] <= -[Goal - Won PPA], [Weighted OpportunityRevenue Value Per Year PPA], 
+			        -[Goal - Won PPA])
+			```
+		formatString: #,0
+		displayFolder: PPA
+		lineageTag: c0b120f5-4820-4f0a-b152-5d4f73327c24
+
+		changedProperty = IsHidden
+
+		annotation PBI_FormatHint = {"isDecimal":true}
+
+	measure '100% Pipe Carbon Credit' = ```
+			// Calculates the portion of the Carbon Credit pipeline that contributes to reaching the goal
+			// Returns either the full weighted pipeline value or just the amount needed to reach the goal
+			
+			    IF(
+			        [Weighted OpportunityRevenue Value Per Year] <= -[Goal - Won Carbon Credit], 
+			        [Weighted OpportunityRevenue Value Per Year], 
+			        -[Goal - Won Carbon Credit])
+			```
+		formatString: #,0
+		displayFolder: Carbon Credit
+		lineageTag: 15745909-fb04-44dd-b6e8-3f36c3f06424
+
+		changedProperty = IsHidden
+
+		annotation PBI_FormatHint = {"isDecimal":true}
+
+	measure 'Won Revenue Value Per Year' = ```
+			// Calculates the annual value of won Carbon Credit opportunities
+			// Divides the total sum by the number of revenue years to get an annual value
+			
+			CALCULATE(
+			
+			    SUMX('OpportunityRevenue', 
+			        'OpportunityRevenue'[Total Sum]
+			        /
+			        'OpportunityRevenue'[Total Revenue Years]),
+			
+			            'OpportunityRevenue'[Revenue Type] = "Carbon Credit",
+			            Opportunity[Status] = "Won",
+			            'OpportunityRevenue'[Carbon Credit] = "Yes"
+			    )
+			
+			```
+		formatString: #,0
+		displayFolder: Carbon Credit
+		lineageTag: 3ba88b9b-590b-4678-89e4-2b0c248f6427
+
+		changedProperty = IsHidden
+
+	measure 'Won Revenue Value Per Year PPA' = ```
+			// Calculates the annual value of won PPA opportunities
+			// Divides the total sum by the number of revenue years to get an annual value
+			
+			CALCULATE(
+			    SUMX('OpportunityRevenue', 
+			        'OpportunityRevenue'[Total Sum]
+			        /
+			        'OpportunityRevenue'[Total Revenue Years]),
+			
+			    'OpportunityRevenue'[Revenue Type] = "Carbon Credit",
+			    Opportunity[Status] = "Won",
+			    'OpportunityRevenue'[Carbon Credit] = "No"
+			)
+			```
+		displayFolder: PPA
+		lineageTag: 1d647194-0f0c-431c-8560-a2fd6dd8e179
+
+	measure 'Weighted OpportunityRevenue Value Per Year PPA' = ```
+			// Calculates the weighted annual pipeline value for PPA opportunities
+			// Returns either weighted or unweighted value based on Toggle selection
+			
+			VAR TotalAmount100 = 
+			    CALCULATE(
+			            SUMX('OpportunityRevenue',
+			            'OpportunityRevenue'[Total Sum]/'OpportunityRevenue'[Total Revenue Years]
+			            ),
+			            'OpportunityRevenue'[Revenue Type] = "PPA",
+			            Opportunity[Status] = "In Progress",
+			            'OpportunityRevenue'[Carbon Credit]="No"
+			    )
+			
+			VAR TotalAmountWeighted = 
+			    CALCULATE(
+			        SUMX(
+			            'OpportunityRevenue', 
+			            ('OpportunityRevenue'[Total Sum] / 'OpportunityRevenue'[Total Revenue Years]) * RELATED(Opportunity[Probability])
+			        ),
+			        'OpportunityRevenue'[Revenue Type] = "PPA",
+			        Opportunity[Status] = "In Progress",
+			        'OpportunityRevenue'[Carbon Credit]="No"
+			    )
+			
+			RETURN
+			IF(
+			    ISFILTERED(Toggle[Opportunity]),
+			    TotalAmount100,
+			    TotalAmountWeighted
+			)
+			
+			```
+		formatString: #,0
+		displayFolder: PPA
+		lineageTag: c0c9c586-b652-40dc-b3b1-ca9870d22f57
+
+		annotation PBI_FormatHint = {"isDecimal":true}
+
+	measure 'Sum of Product Goals 2024' =
+			// Sums up all the product-specific Carbon Credit goals for 2024
+			
+			SUM('Product'[Product Goals 2024 Carbon Credit])
+		displayFolder: Goals
+		lineageTag: 1611a494-e045-423c-b67a-5ce2bda873bf
+
+	measure 'Weighted Opportunity Pipe EaaS' = ```
+			// Calculates the weighted pipeline value for EaaS Services
+			// Returns either weighted or unweighted value based on Toggle selection
+			
+			VAR TotalAmount100 = 
+			  
+			        CALCULATE(
+			        SUM(
+			            'OpportunityRevenue'[Total Sum]
+			        ), 
+			            Opportunity[Status] = "In Progress",
+			            'OpportunityRevenue'[Revenue Type]= "EaaS Services"
+			            )
+			    
+			VAR TotalAmountWeighted =
+			
+			      CALCULATE(
+			        SUMX(
+			            'OpportunityRevenue',
+			            'OpportunityRevenue'[Total Sum]*RELATED(Opportunity[Probability])
+			        ), 
+			            Opportunity[Status] = "In Progress",
+			            'OpportunityRevenue'[Revenue Type]= "EaaS Services"
+			            )
+			
+			RETURN
+			
+			IF(
+			    ISFILTERED(Toggle[Opportunity]),
+			    TotalAmount100,
+			    TotalAmountWeighted
+			)
+			
+			
+			
+			```
+		formatString: #,0
+		displayFolder: EaaS
+		lineageTag: 68a506b9-8472-46a7-ad88-bc753d14650d
+
+		changedProperty = IsHidden
+
+		annotation PBI_FormatHint = {"isDecimal":true}
+
+	partition Measure = m
+		mode: import
+		source =
+				let
+				    Source = Table.FromRows(Json.Document(Binary.Decompress(Binary.FromText("i44FAA==", BinaryEncoding.Base64), Compression.Deflate)), let _t = ((type nullable text) meta [Serialized.Text = true]) in type table [Column1 = _t]),
+				    #"Changed Type" = Table.TransformColumnTypes(Source,{{"Column1", type text}}),
+				    #"Removed Columns" = Table.RemoveColumns(#"Changed Type",{"Column1"})
+				in
+				    #"Removed Columns"
+
+	annotation PBI_ResultType = Table
+
+	annotation PBI_NavigationStepName = Navigation
+

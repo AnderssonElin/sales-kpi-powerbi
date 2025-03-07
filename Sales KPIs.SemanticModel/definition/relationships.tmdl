@@ -1,0 +1,18 @@
+relationship a05da7a5-99cb-98e1-25c5-259c3381736f
+	crossFilteringBehavior: bothDirections
+	fromColumn: OpportunityRevenue.Key_Opportunity
+	toColumn: Opportunity.Key_Opportunity
+
+relationship d21c789b-708b-0383-251b-91eeda1f33a1
+	fromColumn: Opportunity.Date
+	toColumn: DateTable.Date
+
+relationship 51bc124f-40c3-530d-b578-fb2d85a86964
+	crossFilteringBehavior: bothDirections
+	fromColumn: Opportunity.Key_Account
+	toColumn: Account.Key_Account
+
+relationship 6f08d2d9-d589-d5d9-a619-1bea94bceac7
+	fromColumn: OpportunityRevenue.Product_ID
+	toColumn: Product.Product_ID
+

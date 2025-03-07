@@ -1,0 +1,7 @@
+expression Environment = "yourdynamicsurl.crm4.dynamics.com" meta [IsParameterQuery=true, Type="Any", IsParameterQueryRequired=true]
+	lineageTag: 9697f14e-9bf2-45c2-877c-3afd2ac32e25
+
+	annotation PBI_ResultType = Text
+
+	annotation PBI_NavigationStepName = Navigation
+

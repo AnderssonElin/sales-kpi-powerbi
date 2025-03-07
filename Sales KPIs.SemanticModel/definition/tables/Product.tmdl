@@ -1,0 +1,101 @@
+table Product
+	lineageTag: 7fd9f072-ee24-4058-9044-a092d372e664
+
+	column Product
+		dataType: string
+		sourceProviderType: nvarchar(max)
+		lineageTag: 35aab2f9-c08e-418e-9def-52119dc738ac
+		summarizeBy: none
+		sourceColumn: Product
+
+		annotation SummarizationSetBy = Automatic
+
+	column Product_ID
+		dataType: string
+		sourceProviderType: nchar
+		lineageTag: 09155abd-76f8-4192-9514-60babef42069
+		summarizeBy: none
+		sourceColumn: Product_ID
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Product Name Short' = ```
+			// Creates a shorter, more user-friendly product name for visualization
+			// Maps product names to branded names for better readability
+			
+			SWITCH(
+			    'Product'[Product],
+			    "Product 1", "WattWise ",
+			    "Product 2", "EcoCell ",
+			    "Product 3", "PowerBox ",
+			    "Product 4", "ChargeX ",
+			    "Product 5", "GridFlex ",
+			    "Product 6", "WindSync  ",
+			    "Product 7", "VoltIQ",
+			    "Product 8", "EnerLink",
+			    "Product 9", "SolarHub",
+			    "Product 10", "EcoVolt",
+			    'Product'[Product]  // Default value if no match is found
+			)
+			
+			```
+		lineageTag: c5bb53db-f7ca-475e-be61-41f612828294
+		summarizeBy: none
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Product Goals 2024 Carbon Credit' = ```
+			// Defines the Carbon Credit goals for each product for 2024
+			// Used for product-specific goal tracking and analysis
+			
+			SWITCH(
+			    'Product'[Product Name Short],
+			    "WattWise", 412371,
+			    "EcoCell", 68729,
+			    "PowerBox", 85911,
+			    "ChargeX", 13746,
+			    "GridFlex", 109966,
+			    "WindSync", 34364,
+			    "VoltIQ", 82474,
+			    "EnerLink", 137457,
+			    "SolarHub", 34364,
+			    "EcoVolt", 20619,
+			    0  // Default value if no match is found
+			)
+			
+			```
+		formatString: 0
+		lineageTag: 574c8883-fd89-4cb0-97d1-8258742d7617
+		summarizeBy: none
+
+		annotation SummarizationSetBy = Automatic
+
+	partition Product = m
+		mode: directQuery
+		source = ```
+				let
+				     Dataverse = CommonDataService.Database(Environment, 
+				        [CreateNavigationProperties=false]),
+				    SQL = "SELECT 
+				 
+				    edp_name AS Product,
+				    edp_revenuetypeproductid AS Product_ID
+				FROM 
+				    edp_revenuetypeproduct
+				
+				
+				",
+				    Source = Value.NativeQuery(
+				        Dataverse,
+				        SQL,
+				        null,
+				        [EnableFolding=true]
+				    )
+				in
+				    Source
+				```
+
+	annotation PBI_NavigationStepName = Navigation
+
+	annotation PBI_ResultType = Exception
+

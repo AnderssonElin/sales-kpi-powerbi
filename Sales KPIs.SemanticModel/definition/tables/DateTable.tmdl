@@ -1,0 +1,77 @@
+table DateTable
+	lineageTag: b16f9fa9-3275-42b0-8a34-ca4ba58ed763
+	dataCategory: Time
+
+	column Date
+		isKey
+		formatString: yyyy-mm-dd
+		lineageTag: 534dee20-b480-4580-a38b-a78659849776
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [Date]
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isDateTimeCustom":true}
+
+	column Year
+		formatString: 0
+		lineageTag: 35dd201d-c2f4-4bec-8e71-16a0c8788ab8
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [Year]
+
+		annotation SummarizationSetBy = Automatic
+
+	column Month
+		formatString: 0
+		lineageTag: 0810ee4b-0f9b-4144-9288-2daaf07ea7c3
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [Month]
+
+		annotation SummarizationSetBy = Automatic
+
+	column Day
+		formatString: 0
+		lineageTag: 77e8c0ea-a9fa-4ad6-9729-b75c9356a657
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [Day]
+
+		annotation SummarizationSetBy = Automatic
+
+	column DayOfWeek
+		formatString: 0
+		lineageTag: cce4147f-b3b7-4c86-910e-76082e34ac8b
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [DayOfWeek]
+
+		annotation SummarizationSetBy = Automatic
+
+	column MonthName
+		lineageTag: 9d5ad846-8c94-4493-8574-43a4ca01a244
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [MonthName]
+
+		annotation SummarizationSetBy = Automatic
+
+	partition DateTable = calculated
+		mode: import
+		source = ```
+				
+				ADDCOLUMNS (
+				    CALENDAR(DATE(2023, 1, 1), DATE(2030, 12, 31)),
+				    "Year", YEAR([Date]),
+				    "Month", MONTH([Date]),
+				    "Day", DAY([Date]),
+				    "DayOfWeek", WEEKDAY([Date]),
+				    "MonthName", FORMAT([Date], "MMMM")
+				)
+				
+				```
+
+	annotation PBI_Id = e654e4a2b6734d62b057bf905a5cffc0
+

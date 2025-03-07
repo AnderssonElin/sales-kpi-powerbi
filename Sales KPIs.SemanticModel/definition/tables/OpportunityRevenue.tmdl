@@ -1,0 +1,143 @@
+table OpportunityRevenue
+	lineageTag: 2384fa6c-3a4b-4aa9-83f7-36c147dc23b8
+
+	column Key_OpportunityRevenue
+		dataType: string
+		sourceProviderType: nchar
+		lineageTag: 09e7a647-21ec-4d2e-aecb-381d0f8e746f
+		summarizeBy: none
+		sourceColumn: Key_OpportunityRevenue
+
+		annotation SummarizationSetBy = Automatic
+
+	column Key_Opportunity
+		dataType: string
+		sourceProviderType: nchar
+		lineageTag: 3eba4c22-5feb-4c3e-b88b-a9eff3211bd7
+		summarizeBy: none
+		sourceColumn: Key_Opportunity
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Consultant Hours'
+		dataType: int64
+		formatString: 0
+		sourceProviderType: int
+		lineageTag: 4482b5a9-38ab-417e-9c2e-3fc8bb9913a0
+		summarizeBy: sum
+		sourceColumn: Consultant Hours
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Carbon Credit'
+		dataType: string
+		sourceProviderType: nvarchar(max)
+		lineageTag: 00298112-cf10-462a-82a4-17359bbc1b3e
+		summarizeBy: none
+		sourceColumn: Carbon Credit
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Total Sum'
+		dataType: double
+		sourceProviderType: decimal(38, 17)
+		lineageTag: e7b59712-1858-4fee-8f27-b99a81f234fc
+		summarizeBy: sum
+		sourceColumn: Total Sum
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column 'Revenue Type'
+		dataType: string
+		sourceProviderType: nvarchar(max)
+		lineageTag: 604a2b40-a1c0-4fb1-808c-f22e9cf7b1b7
+		summarizeBy: none
+		sourceColumn: Revenue Type
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Revenue Start Date'
+		dataType: dateTime
+		formatString: General Date
+		sourceProviderType: datetime2
+		lineageTag: 556fe3f8-3a10-4d0f-a4a3-46163b6a7fdd
+		summarizeBy: none
+		sourceColumn: Revenue Start Date
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Revenue End Date'
+		dataType: dateTime
+		formatString: General Date
+		sourceProviderType: datetime2
+		lineageTag: 44618b4b-ad48-4b76-b80c-43efe33dfd44
+		summarizeBy: none
+		sourceColumn: Revenue End Date
+
+		annotation SummarizationSetBy = Automatic
+
+	column Product_ID
+		dataType: string
+		sourceProviderType: nchar
+		lineageTag: 2573bcd0-8a13-420e-a8aa-d7c60fc132e1
+		summarizeBy: none
+		sourceColumn: Product_ID
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Total Revenue Years' = ```
+			// Calculates the number of years between the revenue start and end dates
+			// Adds 1 to include both the start and end years in the calculation
+			    VAR YearsDifference = DATEDIFF('OpportunityRevenue'[Revenue Start Date], 'OpportunityRevenue'[Revenue End Date], YEAR)
+			    RETURN YearsDifference + 1
+			
+			```
+		formatString: 0
+		lineageTag: 9319577d-ae57-4755-b3c1-4bb6b1bb0912
+		summarizeBy: sum
+
+		annotation SummarizationSetBy = Automatic
+
+	partition OpportunityRevenue = m
+		mode: directQuery
+		source = ```
+				let
+				    Dataverse = CommonDataService.Database(Environment, [CreateNavigationProperties=false]),
+				    SQL = 
+				    "SELECT
+				    opprev.edp_opportunityrevenueid as Key_OpportunityRevenue, 
+				    opprev.edp_opportunity AS Key_Opportunity,
+				    opprev.edp_consultanthours AS [Consultant Hours],
+				    opprev.edp_ipname AS IP,
+				    opprev.edp_totalsum_base AS [Total Sum],
+				    opprev.edp_revenuetypename AS [Revenue Type],
+				    CAST(opprev.edp_startdate AS DATE) AS [Revenue Start Date],
+				    CAST(opprev.edp_enddate AS DATE) AS [Revenue End Date],
+				    opprev.edp_product AS Product_ID
+				
+				FROM 
+				    edp_opportunityrevenue opprev
+				
+				INNER JOIN Opportunity o ON opprev.edp_opportunity = o.opportunityid
+				
+				WHERE o.edp_businesslineid = '13ecd1a6-f614-ee11-8f6d-000d3a4571fd'
+				",
+				    Source = Value.NativeQuery(
+				        Dataverse,
+				        SQL,
+				        null,
+				        [EnableFolding=true]
+				    ),
+				    #"Renamed Columns" = Table.RenameColumns(Source,{{"IP", "Carbon Credit"}})
+				in
+				    #"Renamed Columns"
+				```
+
+	changedProperty = Name
+
+	annotation PBI_NavigationStepName = Navigation
+
+	annotation PBI_ResultType = Table
+

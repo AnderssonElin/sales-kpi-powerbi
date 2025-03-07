@@ -1,0 +1,131 @@
+table Opportunity
+	lineageTag: ea4d9ce6-c21e-476c-8a3a-d7d1ec14daab
+
+	column 'Business Line'
+		dataType: string
+		sourceProviderType: nvarchar(max)
+		lineageTag: 3f2f6cf9-c965-44ef-8f70-0b6f639e6fee
+		summarizeBy: none
+		sourceColumn: Business Line
+
+		annotation SummarizationSetBy = Automatic
+
+	column Key_Account
+		dataType: string
+		sourceProviderType: nchar
+		lineageTag: 779c31d2-67ad-4b7b-bde9-493d3187d8d2
+		summarizeBy: none
+		sourceColumn: Key_Account
+
+		annotation SummarizationSetBy = Automatic
+
+	column Key_Opportunity
+		dataType: string
+		sourceProviderType: nchar
+		lineageTag: 806e9faf-022d-4df9-bb76-48accc3f38d1
+		summarizeBy: none
+		sourceColumn: Key_Opportunity
+
+		annotation SummarizationSetBy = Automatic
+
+	column Owner
+		dataType: string
+		sourceProviderType: nvarchar(max)
+		lineageTag: 1cd566ad-1986-455e-9d2b-c91f07dc5b8c
+		summarizeBy: none
+		sourceColumn: Owner
+
+		annotation SummarizationSetBy = Automatic
+
+	column Name
+		dataType: string
+		sourceProviderType: nvarchar(max)
+		lineageTag: d2133c9f-c5b5-4d04-908c-385871d79a38
+		summarizeBy: none
+		sourceColumn: Name
+
+		annotation SummarizationSetBy = Automatic
+
+	column Status
+		dataType: string
+		sourceProviderType: nvarchar(max)
+		lineageTag: 751135fe-c932-47b8-9402-b143d801c2c3
+		summarizeBy: none
+		sourceColumn: Status
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Total Amount'
+		dataType: double
+		sourceProviderType: decimal(38, 17)
+		lineageTag: 988e69fc-10bc-4054-8e73-91a24ec0737a
+		summarizeBy: sum
+		sourceColumn: Total Amount
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column Probability
+		dataType: double
+		sourceProviderType: double
+		lineageTag: 919dab4f-6a87-4d61-bcd6-9e1e2809abed
+		summarizeBy: sum
+		sourceColumn: Probability
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column Date
+		dataType: dateTime
+		formatString: General Date
+		sourceProviderType: datetime2
+		lineageTag: 2e588cb2-fc40-43a5-932b-fa5f9a8bd88c
+		summarizeBy: none
+		sourceColumn: Date
+
+		annotation SummarizationSetBy = Automatic
+
+	partition Opportunity = m
+		mode: directQuery
+		source = ```
+				let
+				     Dataverse = CommonDataService.Database(Environment, 
+				        [CreateNavigationProperties=false]),
+				    SQL = "SELECT 
+				 
+				    edp_businesslineidname AS [Business Line],
+				    parentaccountid AS Key_Account,
+				    opportunityid AS Key_Opportunity,
+				    owneridname AS Owner,
+				    name AS Name,
+				    statuscodename AS Status,
+				    edp_totalvalue_base AS [Total Amount],
+				    CAST(LEFT(end_probabilityname, CHARINDEX('%', end_probabilityname) - 1) AS FLOAT) / 100.0 AS Probability,
+				    CASE 
+				        WHEN actualclosedate IS NOT NULL THEN actualclosedate
+				        WHEN EstimatedCloseDate IS NOT NULL THEN EstimatedCloseDate
+				        ELSE ''
+				    END AS [Date]
+				FROM 
+				    opportunity
+				WHERE 
+				    edp_businesslineidname = 'Business Applications CE'
+				
+				
+				",
+				    Source = Value.NativeQuery(
+				        Dataverse,
+				        SQL,
+				        null,
+				        [EnableFolding=true]
+				    )
+				in
+				    Source
+				```
+
+	annotation PBI_NavigationStepName = Navigation
+
+	annotation PBI_ResultType = Exception
+

@@ -1,0 +1,25 @@
+table Toggle
+	lineageTag: b8b890fb-e6e6-4647-8444-36ce4d292b7f
+
+	column Opportunity
+		dataType: string
+		lineageTag: 7c416e3d-61d1-493a-97fb-165d90d81cf7
+		summarizeBy: none
+		sourceColumn: Opportunity
+
+		changedProperty = IsHidden
+
+		annotation SummarizationSetBy = Automatic
+
+	partition Toggle = m
+		mode: import
+		source =
+				let
+				    Source = Table.FromRows(Json.Document(Binary.Decompress(Binary.FromText("i45WerRmiVJsLAA=", BinaryEncoding.Base64), Compression.Deflate)), let _t = ((type nullable text) meta [Serialized.Text = true]) in type table [Toggle = _t]),
+				    #"Changed Type" = Table.TransformColumnTypes(Source,{{"Toggle", type text}}),
+				    #"Renamed Columns" = Table.RenameColumns(#"Changed Type",{{"Toggle", "Opportunity"}})
+				in
+				    #"Renamed Columns"
+
+	annotation PBI_ResultType = Table
+

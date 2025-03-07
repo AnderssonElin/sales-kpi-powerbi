@@ -1,0 +1,112 @@
+{
+  "version": "1.1.0",
+  "diagrams": [
+    {
+      "ordinal": 0,
+      "scrollPosition": {
+        "x": 1350.559854509394,
+        "y": 0
+      },
+      "nodes": [
+        {
+          "location": {
+            "x": 2193.2485158378004,
+            "y": 99.790302981810626
+          },
+          "nodeIndex": "Measure",
+          "nodeLineageTag": "55dc104f-f552-47e8-a93b-ea704ee58040",
+          "size": {
+            "height": 104,
+            "width": 234
+          },
+          "zIndex": 1
+        },
+        {
+          "location": {
+            "x": 2191.1630900633427,
+            "y": 228.50157941006955
+          },
+          "nodeIndex": "Toggle",
+          "nodeLineageTag": "b8b890fb-e6e6-4647-8444-36ce4d292b7f",
+          "size": {
+            "height": 104,
+            "width": 234
+          },
+          "zIndex": 2
+        },
+        {
+          "location": {
+            "x": 574.43235596381476,
+            "y": 412.73433687686355
+          },
+          "nodeIndex": "DateTable",
+          "nodeLineageTag": "b16f9fa9-3275-42b0-8a34-ca4ba58ed763",
+          "size": {
+            "height": 200,
+            "width": 234
+          },
+          "zIndex": 6
+        },
+        {
+          "location": {
+            "x": 0,
+            "y": 133.61782604746878
+          },
+          "nodeIndex": "Account",
+          "nodeLineageTag": "3d1c0b61-ad02-47d3-bea3-f7170478f735",
+          "size": {
+            "height": 152,
+            "width": 234
+          },
+          "zIndex": 0
+        },
+        {
+          "location": {
+            "x": 284,
+            "y": 61.617826047468782
+          },
+          "nodeIndex": "Opportunity",
+          "nodeLineageTag": "ea4d9ce6-c21e-476c-8a3a-d7d1ec14daab",
+          "size": {
+            "height": 296,
+            "width": 234
+          },
+          "zIndex": 0
+        },
+        {
+          "location": {
+            "x": 51.976519312725912,
+            "y": 385.39431593645008
+          },
+          "nodeIndex": "Product",
+          "nodeLineageTag": "7fd9f072-ee24-4058-9044-a092d372e664",
+          "size": {
+            "height": 217.91618370836795,
+            "width": 234
+          },
+          "zIndex": 0
+        },
+        {
+          "location": {
+            "x": 634.86075198827359,
+            "y": 0
+          },
+          "nodeIndex": "OpportunityRevenue",
+          "size": {
+            "height": 296,
+            "width": 234
+          },
+          "zIndex": 0
+        }
+      ],
+      "name": "All tables",
+      "zoomValue": 86.7474538877043,
+      "pinKeyFieldsToTop": false,
+      "showExtraHeaderInfo": false,
+      "hideKeyFieldsWhenCollapsed": false,
+      "tablesLocked": false
+    }
+  ],
+  "selectedDiagram": "All tables",
+  "defaultDiagram": "All tables"
+}
