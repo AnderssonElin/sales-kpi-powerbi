@@ -1,7 +1,17 @@
-# Sales KPIs Dashboard
+## Key Features
+- Tracking of sales goals vs. actual performance
+- Pipeline analysis with weighted and unweighted views
+- Vertical market segmentation (Renewable Energy, E-Commerce, Automotive Machinery, etc.)
+- Product-specific performance metrics
+- Remaining amount calculations to track progress toward goals
+- Annual revenue distribution for multi-year opportunities
+  - The model automatically calculates and distributes revenue across years for opportunities that span multiple years
+  - Revenue is split based on start and end dates defined in the opportunity
+  - This enables accurate year-by-year revenue forecasting and performance tracking
+  - Particularly valuable for long-term contracts like PPA and Carbon Credit agreements as used in the default case
 
-## Overview
-This Power BI report is designed to track and visualize sales Key Performance Indicators (KPIs) for different business lines and products. The dashboard focuses on monitoring revenue streams from various sources including EaaS (Energy as a Service), PPA (Power Purchase Agreement), and Carbon Credit products across different vertical markets.
+![Image](https://github.com/user-attachments/assets/a7de37a3-8a93-428d-8bb4-d979ad6f2064)
+![Image](https://github.com/user-attachments/assets/ebffcf4f-3097-4af2-9bd2-9a3a534a1991)
 
 ## Data Sources
 The report connects to Dynamics 365 CRM through a direct query connection, pulling data from the following entities:
@@ -62,18 +72,6 @@ The semantic model consists of several tables:
 - **Opportunity.Date** (*) to **DateTable.Date** (1): Many-to-one relationship, single direction filtering (→)
 - **Opportunity.Key_Account** (*) to **Account.Key_Account** (1): Many-to-one relationship with bi-directional filtering (◄──►)
 - **OpportunityRevenue.Product_ID** (*) to **Product.Product_ID** (1): Many-to-one relationship, single direction filtering (→)
-
-## Key Features
-- Tracking of sales goals vs. actual performance
-- Pipeline analysis with weighted and unweighted views
-- Vertical market segmentation (Renewable Energy, E-Commerce, Automotive Machinery, etc.)
-- Product-specific performance metrics
-- Remaining amount calculations to track progress toward goals
-- Annual revenue distribution for multi-year opportunities
-  - The model automatically calculates and distributes revenue across years for opportunities that span multiple years
-  - Revenue is split based on start and end dates defined in the opportunity
-  - This enables accurate year-by-year revenue forecasting and performance tracking
-  - Particularly valuable for long-term contracts like PPA and Carbon Credit agreements as used in the default case
 
 ## Usage
 1. Configure the DirectQuery connection as described in the "Connection Setup" section
