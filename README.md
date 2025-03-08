@@ -88,5 +88,5 @@ Since this report uses DirectQuery mode, performance depends on:
 
 For optimal performance, consider applying appropriate filters when analyzing data.
 
-## Documentation
+## Measures
 Additional documentation about the measures used in this report can be found in the "Measures" folder. 
